@@ -132,18 +132,6 @@ Example board:
 
 ```
 
----
-
-## 🚀 Future Improvements
-
-- Colored console output
-- Undo feature
-- High score saving
-- Multiple board sizes
-- Better UI
-- Animation effects
-- AI player
-- Object-Oriented implementation
 
 ---
 

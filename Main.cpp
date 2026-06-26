@@ -7,6 +7,8 @@ using namespace std;
 int const boardSize = 4;
 int board[boardSize][boardSize] = {};
 bool merged;
+bool win=false;
+bool exitGame=false;
 int lastSum = 0;
 bool evenMoved;
 bool evenMerged;
@@ -20,8 +22,11 @@ void leftMove();
 void rightMove();
 void downMove();
 void fillRandomIndex();
+bool endGame();
+bool checkEqualNeighbors(int i,int j);
 void displayBoard()
 {
+    cout << "************************************" << endl;
     cout << endl;
     for (int i = 0; i < boardSize; ++i)
     {
@@ -45,6 +50,8 @@ void displayBoard()
         cout << "|" << endl;
     }
     cout << "+------+------+------+------+" << endl;
+    cout << endl;
+    cout << "************************************" << endl;
 }
 void intializeBoard()
 {
@@ -96,6 +103,7 @@ void playerTurn()
             rightMove();
             return;
         case 'e':
+            exitGame = true;
             return;
         default:
             cout << "Invalid Input, please try again." << endl;
@@ -107,7 +115,7 @@ void playerTurn()
 void playGame()
 {
     intializeBoard();
-    while (true)
+    while (!endGame())
     {
         playerTurn();
         if (evenMoved || evenMerged)
@@ -423,6 +431,7 @@ void menu()
             playGame();
             return;
         case 2:
+            exitGame = true;
             return;
         }
     } while (true);
@@ -431,5 +440,54 @@ void menu()
 int main()
 {
     menu();
-    cout << "\nGame over....";
+    if(win){
+        cout << "Congratulations! You have reached 2048!" << endl;
+    }
+    else if(exitGame){
+        cout << "You have exited the game." << endl;
+    }
+    else{
+        cout << "Game Over! No more moves available." << endl;
+    }
+}
+
+bool endGame(){
+    if(exitGame){
+        return true;
+    }
+    for(int i = 0; i < boardSize; i++){
+        for(int j = 0; j < boardSize; j++){
+            if(board[i][j] == 0){
+                return false;
+            }
+            if(board[i][j]==2048){
+                return true;
+                win=true;
+            }
+        }
+    }
+    for(int i = 0; i < boardSize; i++){
+        for(int j = 0; j < boardSize; j++){
+            if(checkEqualNeighbors(i, j)){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool checkEqualNeighbors(int i, int j){
+    if(i > 0 && board[i][j] == board[i-1][j]){
+        return true;
+    }
+    if(i < boardSize - 1 && board[i][j] == board[i+1][j]){
+        return true;
+    }
+    if(j > 0 && board[i][j] == board[i][j-1]){
+        return true;
+    }
+    if(j < boardSize - 1 && board[i][j] == board[i][j+1]){
+        return true;
+    }
+    return false;
 }

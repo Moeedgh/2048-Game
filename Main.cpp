@@ -4,103 +4,419 @@
 #include <iomanip>
 using namespace std;
 
-int const boardSize=4;
-int board[boardSize][boardSize]={};
-enum{w=1,s,a,d};
+int const boardSize = 4;
+int board[boardSize][boardSize] = {};
+bool merged;
+int lastSum = 0;
+bool evenMoved;
+bool evenMerged;
 void displayBoard();
 void menu();
 void intializeBoard();
 void playGame();
 void playerTurn();
-void displayBoard(){
-    cout<<" ------------------"<<endl;
-    
-    for (int i = 0; i < boardSize; i++)
+void upMove();
+void leftMove();
+void rightMove();
+void downMove();
+void fillRandomIndex();
+void displayBoard()
+{
+    cout << endl;
+    for (int i = 0; i < boardSize; ++i)
     {
-        cout<<"| ";
-        for (int j = 0; j < boardSize; j++)
+        cout << "+------+------+------+------+" << endl;
+        for (int j = 0; j < boardSize; ++j)
         {
-            if(j!=3)
-                cout<<board[i][j]<<setw(5);
-            else
-                  cout<<board[i][j]<<" ";  
+            if (board[i][j] == 0)
+                cout << "|      ";
+            else{
+                if(board[i][j] < 10)
+                    cout << "|  " << board[i][j] << "   ";
+                else if(board[i][j] < 100)
+                    cout << "|  " << board[i][j] << "  ";
+                else if(board[i][j] < 1000)
+                    cout << "| " << board[i][j] << "  ";
+                else
+                    cout << "| " << board[i][j]<< " ";
+            }
+                
         }
-        cout<<"|"<<endl;
+        cout << "|" << endl;
     }
-    cout<<" ------------------"<<endl;
-    
+    cout << "+------+------+------+------+" << endl;
 }
-void intializeBoard(){
+void intializeBoard()
+{
     srand(static_cast<unsigned int>(time(0)));
-    int i=rand()%4;
-    int j=rand()%4;
-    int k,z;
+    int i = rand() % 4;
+    int j = rand() % 4;
+    int k, z;
     while (true)
     {
-        k=rand()%4;
-        z=rand()%4;
-        if(k==i && z==j){
+        k = rand() % 4;
+        z = rand() % 4;
+        if (k == i && z == j)
+        {
             continue;
         }
         else
             break;
     }
-    board[i][j]=2;
-    board[k][z]=2;
+    board[i][j] = 2;
+    board[k][z] = 2;
 }
-void playerTurn(){
+void playerTurn()
+{
     displayBoard();
-    cout<<"Enter a word [ w (up) , s (down) , a (left) , d (right)]";
-    char word;
-    do{
-        cin>>word;
-        switch (word)
-        {
-        case w:
-            
-            return;
-        case s:
-            
-            return;
-        case a:
-            
-            return;
-        case d:
+    cout << "Enter a word [ w (Up) , s (Down) , a (Left) , d (Right) , e (Exit)]" << endl;
+    cout << "Your Choice :";
+    string input;
+    do
+    {
 
+        cin >> input;
+        if (input.length() != 1)
+        {
+            cout << "Invalid Input, please try again." << endl;
+            return;
+        }
+        switch (input[0])
+        {
+        case 'w':
+            upMove();
+            return;
+        case 's':
+            downMove();
+            return;
+        case 'a':
+            leftMove();
+            return;
+        case 'd':
+            rightMove();
+            return;
+        case 'e':
+            return;
+        default:
+            cout << "Invalid Input, please try again." << endl;
             return;
         }
 
-    }while (true);
-    
-    
-
-
+    } while (true);
 }
-void playGame(){
+void playGame()
+{
     intializeBoard();
     while (true)
     {
         playerTurn();
-        system("pause");
+        if (evenMoved || evenMerged)
+        {
+            fillRandomIndex();
+        }
     }
-    
-
-
-
 }
-void upMove(){
-
+void upMove()
+{
+    evenMoved = false;
+    evenMerged = false;
+    for (int i = 1; i < boardSize; i++)
+    {
+        for (int j = 0; j < boardSize; j++)
+        {
+            if (board[i][j] != 0 && board[i - 1][j] == 0)
+            {
+                for (int k = i; k > 0; k--)
+                {
+                    if (board[k - 1][j] == 0)
+                    {
+                        board[k - 1][j] += board[k][j];
+                        board[k][j] = 0;
+                        evenMoved = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    for (int j = 0; j < boardSize; j++)
+    {
+        lastSum = 0;
+        merged = false;
+        for (int i = 0; i < boardSize - 1; i++)
+        {
+            if (board[i][j] == 0)
+            {
+                if (board[i + 1][j] != 0)
+                {
+                    board[i][j] += board[i + 1][j];
+                    board[i + 1][j] = 0;
+                    if (lastSum == board[i][j] && !merged)
+                    {
+                        board[i - 1][j] += board[i][j];
+                        board[i][j] = 0;
+                        merged = true;
+                        lastSum = board[i - 1][j];
+                    }
+                    else
+                    {
+                        lastSum = board[i][j];
+                        merged = false;
+                    }
+                }
+            }
+            else
+            {
+                if (board[i][j] == board[i + 1][j])
+                {
+                    board[i][j] += board[i + 1][j];
+                    board[i + 1][j] = 0;
+                    lastSum = board[i][j];
+                    merged = true;
+                }
+            }
+            if (merged)
+            {
+                evenMerged = true;
+            }
+        }
+    }
 }
-
-void menu(){
-    cout << "*********** Welcom to 2048 Game ***********"<<endl;
-    cout<<"1.Play Game"<<endl
-    <<"2.Exit"<<endl
-    << "Enter your choice:";
+void downMove()
+{
+    evenMoved = false;
+    evenMerged = false;
+    for (int i = boardSize - 2; i >= 0; i--)
+    {
+        for (int j = 0; j < boardSize; j++)
+        {
+            if (board[i][j] != 0 && board[i + 1][j] == 0)
+            {
+                for (int k = i; k < boardSize - 1; k++)
+                {
+                    if (board[k + 1][j] == 0)
+                    {
+                        board[k + 1][j] += board[k][j];
+                        board[k][j] = 0;
+                        evenMoved = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    for (int j = 0; j < boardSize; j++)
+    {
+        lastSum = 0;
+        merged = false;
+        for (int i = boardSize - 1; i > 0; i--)
+        {
+            if (board[i][j] == 0)
+            {
+                if (board[i - 1][j] != 0)
+                {
+                    board[i][j] += board[i - 1][j];
+                    board[i - 1][j] = 0;
+                    if (lastSum == board[i][j] && !merged)
+                    {
+                        board[i + 1][j] += board[i][j];
+                        board[i][j] = 0;
+                        merged = true;
+                        lastSum = board[i + 1][j];
+                    }
+                    else
+                    {
+                        lastSum = board[i][j];
+                        merged = false;
+                    }
+                }
+            }
+            else
+            {
+                if (board[i][j] == board[i - 1][j])
+                {
+                    board[i][j] += board[i - 1][j];
+                    board[i - 1][j] = 0;
+                    lastSum = board[i][j];
+                    merged = true;
+                }
+            }
+            if (merged)
+            {
+                evenMerged = true;
+            }
+        }
+    }
+}
+void rightMove()
+{
+    evenMoved = false;
+    evenMerged = false;
+    for (int i = 0; i < boardSize; i++)
+    {
+        for (int j = boardSize - 2; j >= 0; j--)
+        {
+            if (board[i][j] != 0 && board[i][j + 1] == 0)
+            {
+                for (int k = j; k < boardSize - 1; k++)
+                {
+                    if (board[i][k + 1] == 0)
+                    {
+                        board[i][k + 1] += board[i][k];
+                        board[i][k] = 0;
+                        evenMoved = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    for (int i = 0; i < boardSize; i++)
+    {
+        lastSum = 0;
+        merged = false;
+        for (int j = boardSize - 1; j > 0; j--)
+        {
+            if (board[i][j] == 0)
+            {
+                if (board[i][j - 1] != 0)
+                {
+                    board[i][j] += board[i][j - 1];
+                    board[i][j - 1] = 0;
+                    if (lastSum == board[i][j] && !merged)
+                    {
+                        board[i][j + 1] += board[i][j];
+                        board[i][j] = 0;
+                        merged = true;
+                        lastSum = board[i][j + 1];
+                    }
+                    else
+                    {
+                        lastSum = board[i][j];
+                        merged = false;
+                    }
+                }
+            }
+            else
+            {
+                if (board[i][j] == board[i][j - 1])
+                {
+                    board[i][j] += board[i][j - 1];
+                    board[i][j - 1] = 0;
+                    lastSum = board[i][j];
+                    merged = true;
+                }
+            }
+            if (merged)
+            {
+                evenMerged = true;
+            }
+        }
+    }
+}
+void leftMove()
+{
+    evenMoved = false;
+    evenMerged = false;
+    for (int i = 0; i < boardSize; i++)
+    {
+        for (int j = 1; j < boardSize; j++)
+        {
+            if (board[i][j] != 0 && board[i][j - 1] == 0)
+            {
+                for (int k = j; k > 0; k--)
+                {
+                    if (board[i][k - 1] == 0)
+                    {
+                        board[i][k - 1] += board[i][k];
+                        board[i][k] = 0;
+                        evenMoved = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    for (int i = 0; i < boardSize; i++)
+    {
+        lastSum = 0;
+        merged = false;
+        for (int j = 0; j < boardSize - 1; j++)
+        {
+            if (board[i][j] == 0)
+            {
+                if (board[i][j + 1] != 0)
+                {
+                    board[i][j] += board[i][j + 1];
+                    board[i][j + 1] = 0;
+                    if (lastSum == board[i][j] && !merged)
+                    {
+                        board[i][j - 1] += board[i][j];
+                        board[i][j] = 0;
+                        merged = true;
+                        lastSum = board[i][j - 1];
+                    }
+                    else
+                    {
+                        lastSum = board[i][j];
+                        merged = false;
+                    }
+                }
+            }
+            else
+            {
+                if (board[i][j] == board[i][j + 1])
+                {
+                    board[i][j] += board[i][j + 1];
+                    board[i][j + 1] = 0;
+                    lastSum = board[i][j];
+                    merged = true;
+                }
+            }
+            if (merged)
+            {
+                evenMerged = true;
+            }
+        }
+    }
+}
+void fillRandomIndex()
+{
+    srand(static_cast<unsigned int>(time(0)));
+    while (true)
+    {
+        int i = rand() % 4;
+        int j = rand() % 4;
+        if (board[i][j] == 0)
+        {
+            board[i][j] = 2;
+            break;
+        }
+    }
+}
+void menu()
+{
+    cout << "*********** Welcom to 2048 Game ***********" << endl;
+    cout << "1.Play Game" << endl
+         << "2.Exit" << endl
+         << "Enter your choice:";
     int choice;
-    
-    do{
-        cin>>choice;
+
+    do
+    {
+        cin >> choice;
         switch (choice)
         {
         case 1:
@@ -109,13 +425,11 @@ void menu(){
         case 2:
             return;
         }
-
-
-    }while (true);
+    } while (true);
 }
 
 int main()
 {
     menu();
-    cout<<"\nGame over....";
+    cout << "\nGame over....";
 }

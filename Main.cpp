@@ -75,6 +75,7 @@ void intializeBoard()
 }
 void playerTurn()
 {
+    system("cls");
     displayBoard();
     cout << "Enter a word [ w (Up) , s (Down) , a (Left) , d (Right) , e (Exit)]" << endl;
     cout << "Your Choice :";
@@ -416,6 +417,13 @@ void fillRandomIndex()
 }
 void menu()
 {
+    cout << "*****      ***      *   *     *****\n";
+    cout << "    *     *   *     *   *     *   *\n";
+    cout << "    *     *   *     *   *     *   *\n";  
+    cout<<  "*****     *   *     *****     *****\n";
+    cout<<  "*         *   *         *     *   *\n";
+    cout<<  "*         *   *         *     *   *\n";
+    cout<<  "*****      ***          *     ***** \n";
     cout << "*********** Welcom to 2048 Game ***********" << endl;
     cout << "1.Play Game" << endl
          << "2.Exit" << endl
@@ -428,9 +436,11 @@ void menu()
         switch (choice)
         {
         case 1:
+            system("cls");
             playGame();
             return;
         case 2:
+            system("cls");
             exitGame = true;
             return;
         }
@@ -461,8 +471,8 @@ bool endGame(){
                 return false;
             }
             if(board[i][j]==2048){
-                return true;
                 win=true;
+                return true;
             }
         }
     }
